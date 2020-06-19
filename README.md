@@ -1,8 +1,8 @@
 <!-- badges: start -->
-[![R build status](https://github.com/mdneuzerling/DrakeModelling/workflows/R-CMD-check/badge.svg)](https://github.com/mdneuzerling/DrakeModelling)
+[![R build status](https://github.com/mdneuzerling/ReviewSentiment/workflows/R-CMD-check/badge.svg)](https://github.com/mdneuzerling/ReviewSentiment/actions)
 <!-- badges: end -->
 
-# DrakeModelling
+# ReviewSentiment
 
 [drake](https://github.com/ropensci/drake) is an excellent tool for managing large and complicated workflows. It is the R equivalent of the `make` command, with a particular emphasis on using R functions.
 
