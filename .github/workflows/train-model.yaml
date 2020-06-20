@@ -47,6 +47,7 @@ jobs:
           plan <- training_plan()
           drake::make(plan)
           his <- drake::drake_history()[c("target", "built", "exists", "runtime")]
+          his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
           his_md <- paste("Drake build history:", his_md, sep = "\n")
           writeLines(his_md, "his_md.txt")
