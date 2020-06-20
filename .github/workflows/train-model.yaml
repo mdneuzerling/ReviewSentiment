@@ -3,10 +3,10 @@ on:
     branches:
       - production
 
-name: R-CMD-check
+name: train-model
 
 jobs:
-  R-CMD-check:
+  train-model:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -48,6 +48,7 @@ jobs:
           drake::make(plan)
           his <- drake::drake_history()[c("target", "built", "exists", "runtime")]
           his_md <- knitr::kable(his, format = "markdown")
+          his_md <- paste("Drake build history:", his_md, sep = "\n")
           writeLines(his_md, "his_md.txt")
         shell: Rscript {0}
       - name: Comment drake history on PR
