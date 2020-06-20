@@ -46,7 +46,7 @@ jobs:
           devtools::load_all()
           plan <- training_plan()
           drake::make(plan)
-          his <- drake::drake_history()[c("target", "built", "exists", "runtime")]
+          his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
           his_md <- paste("## Drake build history", paste(his_md, collapse = "\n"), sep = "\n\n")
