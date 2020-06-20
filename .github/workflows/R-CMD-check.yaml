@@ -16,7 +16,10 @@ jobs:
       - uses: r-lib/actions/setup-r@master
       - name: Install workflow dependencies
         run: |
-          install.packages(c("devtools", "renv", "rcmdcheck"))
+          install.packages(
+            c("devtools", "renv", "rcmdcheck"),
+            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
+          )
         shell: Rscript {0}
       - name: Install system dependencies
         env:
@@ -27,7 +30,9 @@ jobs:
           sudo -s eval "$sysreqs"
       - name: Restore dependencies from renv lockfile
         run: |
-          renv::restore(repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest"))
+          renv::restore(
+            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
+          )
         shell: Rscript {0}
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
