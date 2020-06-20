@@ -49,9 +49,15 @@ jobs:
           his <- drake::drake_history()[c("target", "built", "exists", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
-          his_md <- paste("Drake build history:", his_md, sep = "\n")
+          his_md <- paste("## Drake build history", paste(his_md, collapse = "\n"), sep = "\n\n")
           writeLines(his_md, "his_md.txt")
         shell: Rscript {0}
+      - name: Comment drake history on PR
+        uses: machine-learning-apps/pr-comment@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path: his_md.txt
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -67,12 +73,6 @@ jobs:
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
           echo $METRICS_PNG_MARKDOWN > metric_png_markdown.txt
-      - name: Comment drake history on PR
-        uses: machine-learning-apps/pr-comment@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          path: his_md.txt
       - name: Comment metrics.png on PR
         uses: machine-learning-apps/pr-comment@master
         env:
