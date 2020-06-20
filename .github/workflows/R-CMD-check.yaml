@@ -10,14 +10,14 @@ name: R-CMD-check
 
 jobs:
   R-CMD-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
         run: |
           install.packages(c("devtools", "renv", "rcmdcheck"))
-          renv::restore(repos = "https://packagemanager.rstudio.com/all/latest")
+          renv::restore(repos = c("CRAN" = "https://packagemanager.rstudio.com/all/latest"))
         shell: Rscript {0}
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
