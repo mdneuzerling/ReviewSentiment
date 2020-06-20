@@ -42,7 +42,7 @@ jobs:
         run: |
           rstudio_pm <- c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           if (!require("drake")) install.packages("drake", repos = rstudio_pm)
-          if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)"
+          if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)
           devtools::load_all()
           plan <- training_plan()
           drake::make(plan)
