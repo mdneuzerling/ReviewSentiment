@@ -69,7 +69,7 @@ jobs:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         run: |
           METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$GITHUB_RUN_ID/metrics.png"
-          aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --body "artefacts/metrics.png"
+          aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
           echo $METRICS_PNG_MARKDOWN > metric_png_markdown.txt
