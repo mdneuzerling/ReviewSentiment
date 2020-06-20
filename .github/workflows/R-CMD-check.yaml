@@ -1,10 +1,10 @@
 on:
   push:
     branches:
-      - master
+      - trunk
   pull_request:
     branches:
-      - master
+      - trunk
 
 name: R-CMD-check
 
