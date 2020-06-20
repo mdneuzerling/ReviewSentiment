@@ -25,11 +25,13 @@ training_plan <- function() {
       y = factor(reviews$sentiment),
       ntree = 500
     ),
+    roc_curve = generate_roc(review_rf),
     output_model = {
       dir.create("artefacts", showWarnings = FALSE)
       readr::write_rds(vectoriser, file_out("artefacts/vectoriser.rds"))
       readr::write_rds(tfidf, file_out("artefacts/tfidf.rds"))
       readr::write_rds(review_rf, file_out("artefacts/review_rf.rds"))
+      ggplot2::ggsave(file_out("artefacts/metrics.png"), roc_curve)
     }
   )
 }
