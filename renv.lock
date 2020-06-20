@@ -1,0 +1,41 @@
+{
+  "R": {
+    "Version": "4.0.0",
+    "Repositories": [
+      {
+        "Name": "CRAN",
+        "URL": "https://cloud.r-project.org"
+      }
+    ]
+  },
+  "Packages": {
+    "Matrix": {
+      "Package": "Matrix",
+      "Version": "1.2-18",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "08588806cba69f04797dab50627428ed"
+    },
+    "codetools": {
+      "Package": "codetools",
+      "Version": "0.2-16",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "89cf4b8207269ccf82fbeb6473fd662b"
+    },
+    "lattice": {
+      "Package": "lattice",
+      "Version": "0.20-41",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "fbd9285028b0263d76d18c95ae51a53d"
+    },
+    "renv": {
+      "Package": "renv",
+      "Version": "0.10.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0d3f1c2b63e70b3d918246b4e2ca59b7"
+    }
+  }
+}
