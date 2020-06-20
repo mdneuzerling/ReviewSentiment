@@ -16,5 +16,6 @@ generate_roc <- function(rf) {
                   ggplot2::aes(d = actual, m = predicted)) +
     plotROC::geom_roc() +
     ggplot2::coord_equal() +
-    plotROC::style_roc()
+    plotROC::style_roc() +
+    ggplot2::ggtitle("ROC Curve")
 }
