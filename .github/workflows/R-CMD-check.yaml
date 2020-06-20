@@ -17,6 +17,7 @@ jobs:
       - name: Install workflow dependencies
         run: |
           install.packages(c("devtools", "renv", "rcmdcheck"))
+        shell: Rscript {0}
       - name: Install system dependencies
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
