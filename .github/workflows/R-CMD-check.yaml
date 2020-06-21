@@ -13,31 +13,6 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@master
-      - name: Install remotes
+      - name: Echo run_id
         run: |
-          install.packages(
-            "remotes",
-            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          )
-        shell: Rscript {0}
-      - name: Install system dependencies
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
-        run: |
-          Rscript -e "remotes::install_github('r-hub/sysreqs')"
-          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
-          sudo -s eval "$sysreqs"
-      - name: Restore dependencies from renv lockfile
-        run: |
-          install.packages(
-            c("renv", "rcmdcheck"),
-            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          )
-          renv::restore(
-            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          )
-        shell: Rscript {0}
-      - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+          echo $GITHUB_RUN_ID
