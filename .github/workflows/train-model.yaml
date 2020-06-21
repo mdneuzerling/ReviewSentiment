@@ -42,6 +42,7 @@ jobs:
           if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)
           devtools::load_all()
           plan <- training_plan()
+          set.seed(Sys.getenv("$GITHUB_RUN_ID"))
           drake::make(plan)
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
