@@ -25,15 +25,12 @@ jobs:
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
-      - name: Install workflow dependencies
+      - name: Restore dependencies from renv lockfile
         run: |
           install.packages(
             c("renv", "rcmdcheck"),
             repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           )
-        shell: Rscript {0}
-      - name: Restore dependencies from renv lockfile
-        run: |
           renv::restore(
             repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           )
@@ -50,14 +47,8 @@ jobs:
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
           his_md <- paste("## Drake build history", paste(his_md, collapse = "\n"), sep = "\n\n")
-          writeLines(his_md, "his_md.txt")
+          writeLines(his_md, "bot-comment.txt")
         shell: Rscript {0}
-      - name: Comment drake history on PR
-        uses: machine-learning-apps/pr-comment@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          path: his_md.txt
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -72,10 +63,10 @@ jobs:
           aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
-          echo $METRICS_PNG_MARKDOWN > metric_png_markdown.txt
-      - name: Comment metrics.png on PR
+          echo '\n\n'$METRICS_PNG_MARKDOWN >> bot-comment.txt
+      - name: Comment on pull request
         uses: machine-learning-apps/pr-comment@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          path: metric_png_markdown.txt
+          path: bot-comment.txt
