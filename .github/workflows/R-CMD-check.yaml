@@ -28,15 +28,12 @@ jobs:
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
-      - name: Install workflow dependencies
+      - name: Restore dependencies from renv lockfile
         run: |
           install.packages(
             c("renv", "rcmdcheck"),
             repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           )
-        shell: Rscript {0}
-      - name: Restore dependencies from renv lockfile
-        run: |
           renv::restore(
             repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           )
