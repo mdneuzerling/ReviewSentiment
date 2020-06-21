@@ -3,10 +3,10 @@ on:
     branches:
       - production
 
-name: R-CMD-check
+name: train-model
 
 jobs:
-  R-CMD-check:
+  train-model:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -42,12 +42,14 @@ jobs:
         run: |
           rstudio_pm <- c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           if (!require("drake")) install.packages("drake", repos = rstudio_pm)
-          if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)"
+          if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)
           devtools::load_all()
           plan <- training_plan()
           drake::make(plan)
-          his <- drake::drake_history()[c("target", "built", "exists", "runtime")]
+          his <- drake::drake_history()[c("target", "built", "runtime")]
+          his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
+          his_md <- paste("## Drake build history", paste(his_md, collapse = "\n"), sep = "\n\n")
           writeLines(his_md, "his_md.txt")
         shell: Rscript {0}
       - name: Comment drake history on PR
@@ -56,3 +58,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           path: his_md.txt
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Upload metrics image
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        run: |
+          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$GITHUB_RUN_ID/metrics.png"
+          aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
+          METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
+          METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
+          echo $METRICS_PNG_MARKDOWN > metric_png_markdown.txt
+      - name: Comment metrics.png on PR
+        uses: machine-learning-apps/pr-comment@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path: metric_png_markdown.txt
