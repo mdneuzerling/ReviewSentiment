@@ -63,7 +63,7 @@ jobs:
           aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
-          echo '\n\n'$METRICS_PNG_MARKDOWN >> bot-comment.txt
+          echo -e "\n\n$METRICS_PNG_MARKDOWN" >> bot-comment.txt
       - name: Comment on pull request
         uses: machine-learning-apps/pr-comment@master
         env:
