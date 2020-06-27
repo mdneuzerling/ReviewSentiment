@@ -82,8 +82,9 @@ jobs:
           path: bot-comment.txt
       - name: Tar artefacts as candidate model
         run: tar czf candidate-model.tar.gz artefacts
-      - name: Upload candidate model as GitHub artefact
-        uses: actions/upload-artifact@v2
-        with:
-          name: candidate-model
-          path: candidate-model.tar.gz
+      - name: Upload candidate_model to S3
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        run: |
+          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$GITHUB_SHA/candidate-model.tar.gz"
+          aws s3api put-object --bucket "$S3_BUCKET" --key "$CANDIDATE_MODEL_KEY" --acl "public-read" --body "candidate-model.tar.gz"
