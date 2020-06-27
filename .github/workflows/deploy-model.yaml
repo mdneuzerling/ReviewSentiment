@@ -11,12 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git log
-      - run: git show HEAD~1 --pretty=format:"%H" --no-patch
-      # - name: Dump GitHub context
-      #   run: ${{ github.event.commits[-2].id }}
-      #   env:
-      #     GITHUB_CONTEXT: ${{ toJson(github) }}
-      #   run: echo "$GITHUB_CONTEXT"
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump commits
+        run: echo "${{ github.event.commits.length }}"
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
