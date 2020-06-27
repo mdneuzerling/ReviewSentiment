@@ -47,8 +47,9 @@ jobs:
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
-          his_md <- paste("## Drake build history", paste(his_md, collapse = "\n"), sep = "\n\n")
-          writeLines(his_md, "bot-comment.txt")
+          writeLines(paste0("# Training run ", Sys.getenv("GITHUB_RUN_ID"), "\n\n"), "bot-comment.txt")
+          write("\n## Drake build history\n\n", "bot-comment.txt", append = TRUE)
+          write(knitr::kable(his, format = "markdown"), "bot-comment.txt", append = TRUE)
         shell: Rscript {0}
       - name: Convert metrics tables to markdown
         run: |
