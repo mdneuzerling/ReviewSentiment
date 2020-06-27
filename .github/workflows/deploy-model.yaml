@@ -16,7 +16,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
       - name: Dump commits
-        run: echo "${{ github.event.commits[0].id }}"
+        run: echo "${{ github.event.commits[-1].id }}"
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
