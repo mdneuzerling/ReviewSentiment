@@ -50,6 +50,15 @@ jobs:
           his_md <- paste("## Drake build history", paste(his_md, collapse = "\n"), sep = "\n\n")
           writeLines(his_md, "bot-comment.txt")
         shell: Rscript {0}
+      - name: Convert metrics tables to markdown
+        run: |
+          cm <- readr::read_rds("artefacts/confusion_matrix.rds")
+          metrics <- readr::read_rds("artefacts/metrics.rds")
+          write("\n\n", "bot-comment.txt", append = TRUE)
+          write(knitr::kable(cm, format = "markdown"), "bot-comment.txt", append = TRUE)
+          write("\n\n", "bot-comment.txt", append = TRUE)
+          write(knitr::kable(metrics, format = "markdown"), "bot-comment.txt", append = TRUE)
+        shell: Rscript {0}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
