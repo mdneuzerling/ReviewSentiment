@@ -3,10 +3,10 @@ on:
     branches:
       - production
 
-name: train-model
+name: model-training
 
 jobs:
-  train-model:
+  model-training:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -36,19 +36,21 @@ jobs:
           )
         shell: Rscript {0}
       - name: drake-make
+        env:
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
         run: |
           rstudio_pm <- c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           if (!require("drake")) install.packages("drake", repos = rstudio_pm)
           if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)
           devtools::load_all()
           plan <- training_plan()
-          set.seed(Sys.getenv("GITHUB_RUN_ID"))
+          set.seed(Sys.getenv("PULL_REQUEST"))
           drake::make(plan)
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
-          writeLines(paste0("# Training run ", Sys.getenv("GITHUB_RUN_ID"), "\n\n"), "bot-comment.txt")
-          write("\n## Drake build history\n\n", "bot-comment.txt", append = TRUE)
+          writeLines(paste0("# Training run ", Sys.getenv("PULL_REQUEST"), "\n\n"), "bot-comment.txt")
+          write("\n### Drake build history\n\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(his, format = "markdown"), "bot-comment.txt", append = TRUE)
         shell: Rscript {0}
       - name: Convert metrics tables to markdown
@@ -69,8 +71,9 @@ jobs:
       - name: Upload metrics image
         env:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
         run: |
-          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$GITHUB_RUN_ID/metrics.png"
+          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$PULL_REQUEST/metrics.png"
           aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
