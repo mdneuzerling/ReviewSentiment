@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - run: git log --pretty=format:"%s"
+      - run: git show HEAD --pretty=format:"%H" --no-patch
       # - name: Dump GitHub context
       #   run: ${{ github.event.commits[-2].id }}
       #   env:
