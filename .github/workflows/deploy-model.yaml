@@ -12,7 +12,6 @@ jobs:
       - uses: actions/checkout@v2
       - run: git log
       - name: Dump commits
-        env:
         run: echo "${{ github.event.commits }}"
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v1
