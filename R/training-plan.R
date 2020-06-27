@@ -25,12 +25,16 @@ training_plan <- function() {
       y = factor(reviews$sentiment),
       ntree = 500
     ),
-    roc_curve = generate_roc(review_rf),
+    roc_curve = generate_roc(review_rf, positive = "good"),
+    confusion_matrix = generate_confusion_matrix(review_rf),
+    metrics = generate_metrics(review_rf, positive = "good"),
     output_model = {
       dir.create("artefacts", showWarnings = FALSE)
       readr::write_rds(vectoriser, file_out("artefacts/vectoriser.rds"))
       readr::write_rds(tfidf, file_out("artefacts/tfidf.rds"))
       readr::write_rds(review_rf, file_out("artefacts/review_rf.rds"))
+      readr::write_rds(confusion_matrix, file_out("artefacts/confusion_matrix.rds"))
+      readr::write_rds(metrics, file_out("artefacts/metrics.rds"))
       ggplot2::ggsave(file_out("artefacts/metrics.png"), roc_curve)
     }
   )
