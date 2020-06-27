@@ -4,6 +4,9 @@ on:
       - production
     types:
       - closed
+
+name: model-deployment
+
 jobs:
   merge-PR:
     if: github.event.pull_request.merged == true
