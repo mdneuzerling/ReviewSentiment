@@ -54,9 +54,9 @@ jobs:
         run: |
           cm <- readr::read_rds("artefacts/confusion_matrix.rds")
           metrics <- readr::read_rds("artefacts/metrics.rds")
-          write("\n\n", "bot-comment.txt", append = TRUE)
+          write("\n\n### Confusion matrix\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(cm, format = "markdown"), "bot-comment.txt", append = TRUE)
-          write("\n\n", "bot-comment.txt", append = TRUE)
+          write("\n\n### Metrics\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(metrics, format = "markdown"), "bot-comment.txt", append = TRUE)
         shell: Rscript {0}
       - name: Configure AWS Credentials
@@ -82,8 +82,9 @@ jobs:
           path: bot-comment.txt
       - name: Tar artefacts as candidate model
         run: tar czf candidate-model.tar.gz artefacts
-      - name: Upload candidate model as GitHub artefact
-        uses: actions/upload-artifact@v2
-        with:
-          name: candidate-model
-          path: candidate-model.tar.gz
+      - name: Upload candidate_model to S3
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        run: |
+          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$GITHUB_SHA/candidate-model.tar.gz"
+          aws s3api put-object --bucket "$S3_BUCKET" --key "$CANDIDATE_MODEL_KEY" --acl "public-read" --body "candidate-model.tar.gz"
