@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: r-lib/actions/setup-r@master
       - name: Install remotes
         run: |
@@ -51,7 +55,7 @@ jobs:
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
-          writeLines(paste0("# Training run ", Sys.getenv("$COMMIT_HASH"), "\n\n"), "bot-comment.txt")
+          writeLines(paste0("# Training run ", Sys.getenv("COMMIT_HASH"), "\n\n"), "bot-comment.txt")
           write("\n### Drake build history\n\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(his, format = "markdown"), "bot-comment.txt", append = TRUE)
         shell: Rscript {0}
