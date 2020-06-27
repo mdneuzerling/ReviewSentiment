@@ -10,7 +10,7 @@
 generate_confusion_matrix <- function(rf) {
   rf$confusion %>%
     dplyr::as_tibble() %>%
-    dplyr::mutate(error = paste0(round(100 * class.error, 2), "%")) %>%
+    dplyr::mutate(error = paste0(round(100 * .data$class.error, 2), "%")) %>%
     dplyr::select(-class.error)
 }
 
