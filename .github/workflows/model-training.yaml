@@ -49,7 +49,7 @@ jobs:
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
-          writeLines(paste0("# Training run\n\n"), "bot-comment.txt")
+          writeLines(paste0("# Training run", Sys.getenv("$GITHUB_RUN_ID"), "\n\n"), "bot-comment.txt")
           write("\n### Drake build history\n\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(his, format = "markdown"), "bot-comment.txt", append = TRUE)
         shell: Rscript {0}
@@ -73,7 +73,7 @@ jobs:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           PULL_REQUEST: ${{ github.event.pull_request.number }}
         run: |
-          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$PULL_REQUEST/metrics.png"
+          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$PULL_REQUEST/$GITHUB_RUN_ID/metrics.png"
           aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
