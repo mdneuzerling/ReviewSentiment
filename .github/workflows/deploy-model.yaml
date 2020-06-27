@@ -14,6 +14,10 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+      - name: echo second last commit
+        run: git log HEAD@{1} -1
+      - name: echo git log
+        run: git log
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -23,7 +27,6 @@ jobs:
       - name: Copy candidate_model to production_model
         env:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          COMMIT_HASH: ${{ github.event.commits[-2].id }}
         run: |
           CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
           PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
