@@ -1,6 +1,6 @@
 #' Generate a confusion matrix from a random forest as a tibble
 #'
-#' @param rf A randomForest object.
+#' @param rf A model created with the \verb{randomForest} package.
 #'
 #' @return Tibble.
 #'
@@ -16,17 +16,18 @@ generate_confusion_matrix <- function(rf) {
 
 #' Generate a tibble of metrics from a random forest
 #'
-##' @param rf A randomForest object.
+#' @inheritParams generate_roc
 #'
 #' @return Tibble.
 #' @export
 #'
-generate_metrics <- function(rf) {
+generate_metrics <- function(rf, positive) {
   # Create our own function to avoid dependency on scales package
-  percent <- function(x) paste0(round(x * 100, digits = 2), "%")
-  oob <- percent(rf$err.rate[rf$ntree, "OOB"])
+  percent <- function(x) round(x * 100, digits = 2)
+  oob <- paste0(percent(rf$err.rate[rf$ntree, "OOB"]), "%")
 
-  roc_curve <- generate_roc(rf) # Warning: this code is duplicated in the plan
+  # Warning: this code is run twice in the training plan due to generate_roc
+  roc_curve <- generate_roc(rf, positive)
   auc <- percent(plotROC::calc_auc(roc_curve)$AUC)
 
   dplyr::tibble(oob = oob, auc = auc)
