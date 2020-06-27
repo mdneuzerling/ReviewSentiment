@@ -35,7 +35,8 @@ Suggests:
     knitr,
     rmarkdown,
     tibble,
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    datasets
 VignetteBuilder: knitr
 URL: https://github.com/mdneuzerling/ReviewSentiment
 BugReports: https://github.com/mdneuzerling/ReviewSentiment/issues
