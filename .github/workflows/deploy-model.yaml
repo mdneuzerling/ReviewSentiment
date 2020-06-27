@@ -5,11 +5,11 @@ on:
     types:
       - closed
 jobs:
-  env:
-    S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-    COMMIT_HASH: ${{ github.event.after }}
   merge-PR:
     if: github.event.pull_request.merged == true
+    env:
+      S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+      COMMIT_HASH: ${{ github.event.after }}
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
