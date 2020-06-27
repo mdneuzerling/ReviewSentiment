@@ -7,9 +7,6 @@ on:
 jobs:
   merge-PR:
     if: github.event.pull_request.merged == true
-    env:
-      S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-      COMMIT_HASH: ${{ github.event.after }}
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -20,6 +17,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Copy candidate_model to production_model
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          COMMIT_HASH: ${{ github.event.after }}
         run: |
           CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
           PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
