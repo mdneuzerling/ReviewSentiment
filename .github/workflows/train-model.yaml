@@ -71,3 +71,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           path: bot-comment.txt
+      - name: Tar artefacts as candidate model
+        run: tar czf candidate-model.tar.gz artefacts
+      - name: Upload candidate model as GitHub artefact
+        uses: actions/upload-artifact@v2
+        with:
+          name: candidate-model
+          path: candidate-model.tar.gz
