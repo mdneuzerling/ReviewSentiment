@@ -4,10 +4,13 @@
 \alias{generate_roc}
 \title{Generate a ROC curve from the training data of a randomForest model}
 \usage{
-generate_roc(rf)
+generate_roc(rf, positive = "good")
 }
 \arguments{
 \item{rf}{A model created with the \verb{randomForest} package.}
+
+\item{positive}{Character. The value of the positive case in the binomial
+classification.}
 }
 \value{
 A \verb{ggplot2} plot.
@@ -16,4 +19,7 @@ A \verb{ggplot2} plot.
 In a real-life application, we wouldn't be using training data to plot our
 ROC curve, as random forests greatly overfit on their training data. Since
 this isn't a serious exercise in machine learning, we can get away with it.
+}
+\details{
+We're assuming a random forest used for binary classification.
 }

@@ -4,10 +4,13 @@
 \alias{generate_metrics}
 \title{Generate a tibble of metrics from a random forest}
 \usage{
-generate_metrics(rf)
+generate_metrics(rf, positive)
 }
 \arguments{
-\item{rf}{A randomForest object.}
+\item{rf}{A model created with the \verb{randomForest} package.}
+
+\item{positive}{Character. The value of the positive case in the binomial
+classification.}
 }
 \value{
 Tibble.

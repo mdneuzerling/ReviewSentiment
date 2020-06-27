@@ -7,7 +7,7 @@
 generate_confusion_matrix(rf)
 }
 \arguments{
-\item{rf}{A randomForest object.}
+\item{rf}{A model created with the \verb{randomForest} package.}
 }
 \value{
 Tibble.
