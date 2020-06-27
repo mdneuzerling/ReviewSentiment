@@ -19,9 +19,9 @@ jobs:
       - name: Copy candidate_model to production_model
         env:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          PULL_REQUEST: ${{ github.event.pull_request.number }}
+          COMMIT_HASH: ${{ github.event.before }}
         run: |
-          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$PULL_REQUEST/candidate-model.tar.gz"
+          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
           PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
           echo $PULL_REQUEST
 #          aws s3api copy-object --bucket "$S3_BUCKET" --key "$S3_BUCKET/$CANDIDATE_MODEL_KEY" --acl "public-read" --key "$PRODUCTION_MODEL_KEY"

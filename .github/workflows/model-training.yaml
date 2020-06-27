@@ -37,19 +37,21 @@ jobs:
         shell: Rscript {0}
       - name: drake-make
         env:
-          PULL_REQUEST: ${{ github.event.pull_request.number }}
+          COMMIT_HASH: ${{ github.event.pull_request.base.sha }}
         run: |
           rstudio_pm <- c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           if (!require("drake")) install.packages("drake", repos = rstudio_pm)
           if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)
+          if (!require("digest")) install.packages("knitr", repos = rstudio_pm)
           devtools::load_all()
           plan <- training_plan()
-          set.seed(Sys.getenv("PULL_REQUEST"))
+          seed <- digest::digest2int(Sys.getenv("COMMIT_HASH"))
+          set.seed(seed)
           drake::make(plan)
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
           his_md <- knitr::kable(his, format = "markdown")
-          writeLines(paste0("# Training run", Sys.getenv("$GITHUB_RUN_ID"), "\n\n"), "bot-comment.txt")
+          writeLines(paste0("# Training run ", Sys.getenv("$COMMIT_HASH"), "\n\n"), "bot-comment.txt")
           write("\n### Drake build history\n\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(his, format = "markdown"), "bot-comment.txt", append = TRUE)
         shell: Rscript {0}
@@ -71,9 +73,9 @@ jobs:
       - name: Upload metrics image
         env:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          PULL_REQUEST: ${{ github.event.pull_request.number }}
+          COMMIT_HASH: ${{ github.event.pull_request.base.sha }}
         run: |
-          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$PULL_REQUEST/$GITHUB_RUN_ID/metrics.png"
+          METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$COMMIT_HASH/metrics.png"
           aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
           METRICS_PNG_URL=$"https://$S3_BUCKET.s3.amazonaws.com/$METRICS_PNG_KEY"
           METRICS_PNG_MARKDOWN=$'!'"[]($METRICS_PNG_URL)"
@@ -89,6 +91,7 @@ jobs:
       - name: Upload candidate_model to S3
         env:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          COMMIT_HASH: ${{ github.event.pull_request.base.sha }}
         run: |
-          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$GITHUB_SHA/candidate-model.tar.gz"
+          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
           aws s3api put-object --bucket "$S3_BUCKET" --key "$CANDIDATE_MODEL_KEY" --acl "public-read" --body "candidate-model.tar.gz"
