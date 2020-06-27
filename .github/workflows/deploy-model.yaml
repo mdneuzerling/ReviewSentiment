@@ -23,7 +23,7 @@ jobs:
       - name: Copy candidate_model to production_model
         env:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          COMMIT_HASH: ${{ github.event.after }}
+          COMMIT_HASH: ${{ github.event.commits[-2].id }}
         run: |
           CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
           PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
