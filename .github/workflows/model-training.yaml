@@ -7,12 +7,13 @@ name: model-training
 
 jobs:
   model-training:
-    env:
-      S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-      COMMIT_HASH: ${{ github.event.after }}
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: r-lib/actions/setup-r@master
       - name: Install remotes
         run: |
@@ -39,6 +40,8 @@ jobs:
           )
         shell: Rscript {0}
       - name: drake-make
+        env:
+          COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
         run: |
           rstudio_pm <- c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
           if (!require("drake")) install.packages("drake", repos = rstudio_pm)
@@ -72,6 +75,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Upload metrics image
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
         run: |
           METRICS_PNG_KEY=$"$GITHUB_REPOSITORY/$GITHUB_WORKFLOW/$COMMIT_HASH/metrics.png"
           aws s3api put-object --bucket "$S3_BUCKET" --key "$METRICS_PNG_KEY" --content-type "image/png" --acl "public-read" --body "artefacts/metrics.png"
@@ -87,6 +93,9 @@ jobs:
       - name: Tar artefacts as candidate model
         run: tar czf candidate-model.tar.gz artefacts
       - name: Upload candidate_model to S3
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
         run: |
           CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
           aws s3api put-object --bucket "$S3_BUCKET" --key "$CANDIDATE_MODEL_KEY" --acl "public-read" --body "candidate-model.tar.gz"
