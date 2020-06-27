@@ -21,7 +21,7 @@ generate_confusion_matrix <- function(rf) {
 #' @return Tibble.
 #' @export
 #'
-generate_metrics <- function(rf, positive) {
+generate_metrics <- function(rf, positive = "good") {
   # Create our own function to avoid dependency on scales package
   percent <- function(x) round(x * 100, digits = 2)
   oob <- paste0(percent(rf$err.rate[rf$ntree, "OOB"]), "%")
