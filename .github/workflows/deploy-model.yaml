@@ -22,4 +22,5 @@ jobs:
         run: |
           CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$GITHUB_SHA/candidate-model.tar.gz"
           PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
-          echo CANDIDATE_MODEL_KEY
+          echo $CANDIDATE_MODEL_KEY
+#          aws s3api copy-object --bucket "$S3_BUCKET" --key "$S3_BUCKET/$CANDIDATE_MODEL_KEY" --acl "public-read" --key "$PRODUCTION_MODEL_KEY"
