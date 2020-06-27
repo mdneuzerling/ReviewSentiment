@@ -14,10 +14,10 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: echo second last commit
-        run: git log HEAD@{1} -1
       - name: echo git log
         run: git log
+      - name: echo second last commit
+        run: git log HEAD@{1} -1
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
