@@ -2,33 +2,26 @@ on:
   push:
     branches:
       - production
-
-name: deploy-model
-
+    types:
+      - closed
 jobs:
-  deploy-model:
+  env:
+    S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+    COMMIT_HASH: ${{ github.event.after }}
+  merge-PR:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - run: git log
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Dump commits
-        run: echo "${{ github.event.commits.length }}"
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.AWS_REGION }}
-      # - name: Copy candidate_model to production_model
-      #   env:
-      #     S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-      #     COMMIT_HASH: ${{ github.event.commits[-2].id }}
-      #   run: |
-      #     CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
-      #     PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
-      #     echo $COMMIT_HASH
-      #     aws s3api copy-object --bucket "$S3_BUCKET" --key "$S3_BUCKET/$CANDIDATE_MODEL_KEY" --acl "public-read" --key "$PRODUCTION_MODEL_KEY"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Copy candidate_model to production_model
+        run: |
+          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$COMMIT_HASH/candidate-model.tar.gz"
+          PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
+          echo $COMMIT_HASH
+          aws s3api copy-object --bucket "$S3_BUCKET" --key "$S3_BUCKET/$CANDIDATE_MODEL_KEY" --acl "public-read" --key "$PRODUCTION_MODEL_KEY"
