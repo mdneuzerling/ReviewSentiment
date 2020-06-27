@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - production
+
+name: deploy-model
+
+jobs:
+  deploy-model:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Copy candidate_model to production_model
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        run: |
+          CANDIDATE_MODEL_KEY=$"$GITHUB_REPOSITORY/candidate-models/$GITHUB_SHA/candidate-model.tar.gz"
+          PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
+          aws s3api copy-object --bucket "$S3_BUCKET" --key "$S3_BUCKET/$CANDIDATE_MODEL_KEY" --acl "public-read" --key "$PRODUCTION_MODEL_KEY"
