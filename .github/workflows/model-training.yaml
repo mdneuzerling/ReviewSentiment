@@ -35,7 +35,7 @@ jobs:
           renv::restore(repos = cran_repo)
           if (!require("drake")) install.packages("drake", repos = cran_repo)
           if (!require("knitr")) install.packages("knitr", repos = cran_repo)
-          if (!require("digest")) install.packages("knitr", repos = cran_repo)
+          if (!require("digest")) install.packages("digest", repos = cran_repo)
         shell: Rscript {0}
       - name: drake-make
         run: |

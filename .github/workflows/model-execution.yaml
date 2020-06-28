@@ -51,9 +51,9 @@ jobs:
       - name: drake-make
         run: |
           devtools::load_all()
+          plan <- execution_plan()
           seed <- digest::digest2int(Sys.getenv("GITHUB_SHA"))
           set.seed(seed)
-          plan <- execution_plan()
           drake::make(plan)
           print(paste("Model executed with SHA as seed:", Sys.getenv("GITHUB_SHA")))
         shell: Rscript {0}
