@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
         with:
-          r-version: '3.6.3'
+          r-version: '4.0.0'
       - name: Install remotes
         run: |
           install.packages("remotes", repos = c("CRAN" = Sys.getenv("CRAN_REPO")))
@@ -46,7 +46,6 @@ jobs:
           drake::make(plan)
           his <- drake::drake_history()[c("target", "built", "runtime")]
           his <- his[with(his, order(-runtime)), ]
-          his_md <- knitr::kable(his, format = "markdown")
           writeLines(paste0("# Training run ", Sys.getenv("COMMIT_HASH"), "\n\n"), "bot-comment.txt")
           write("\n### Drake build history\n\n", "bot-comment.txt", append = TRUE)
           write(knitr::kable(his, format = "markdown"), "bot-comment.txt", append = TRUE)

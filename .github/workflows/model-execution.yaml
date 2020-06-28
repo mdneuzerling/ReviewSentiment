@@ -1,0 +1,63 @@
+on:
+  push:
+    branches:
+      - production
+  schedule:
+    - cron: '0 12 * * 1'
+
+name: model-execution
+
+jobs:
+  model-execution:
+    env:
+      S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+      CRAN_REPO: https://packagemanager.rstudio.com/all/__linux__/bionic/latest
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Upload candidate_model to S3
+        run: |
+          PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
+          aws s3api get-object --bucket "$S3_BUCKET" --key "PRODUCTION_MODEL_KEY" production-model.tar.gz
+      - name: Un-tar artefacts from production model
+        run: tar -xvf production-model.tar.gz
+      - uses: r-lib/actions/setup-r@master
+        with:
+          r-version: '4.0.0'
+      - name: Install remotes
+        run: |
+          install.packages("remotes", repos = c("CRAN" = Sys.getenv("CRAN_REPO")))
+        shell: Rscript {0}
+      - name: Install system dependencies
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+        run: |
+          Rscript -e "remotes::install_github('r-hub/sysreqs')"
+          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
+          sudo -s eval "$sysreqs"
+      - name: Restore and install dependencies
+        run: |
+          cran_repo <- c("CRAN" = Sys.getenv("CRAN_REPO"))
+          install.packages(c("renv", "rcmdcheck"), repos = cran_repo)
+          renv::restore(repos = cran_repo)
+          if (!require("drake")) install.packages("drake", repos = cran_repo)
+        shell: Rscript {0}
+      - name: drake-make
+        run: |
+          devtools::load_all()
+          seed <- digest::digest2int(Sys.getenv("GITHUB_SHA"))
+          set.seed(seed)
+          plan <- execution_plan()
+          drake::make(plan)
+          print(paste("Model executed with SHA as seed:", Sys.getenv("GITHUB_SHA")))
+        shell: Rscript {0}
+      - name: Upload predictions as GitHub Actions artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: predictions
+          path: artefacts/predictions.txt

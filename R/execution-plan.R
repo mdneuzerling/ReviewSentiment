@@ -13,6 +13,11 @@ execution_plan <- function() {
                             random_forest = review_rf,
                             vectoriser = vectoriser,
                             tfidf = tfidf),
-    submit_predictions = submit_predictions(predictions)
+    output_predictions = {
+      writeLines(
+        paste(predictions, collapse = ", "),
+        file_out("artefacts/predictions.txt")
+      )
+    }
   )
 }
