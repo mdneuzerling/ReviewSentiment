@@ -10,6 +10,7 @@ jobs:
     env:
       S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
       COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
+      CRAN_REPO: https://packagemanager.rstudio.com/all/__linux__/bionic/latest
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -18,10 +19,7 @@ jobs:
           r-version: '3.6.3'
       - name: Install remotes
         run: |
-          install.packages(
-            "remotes",
-            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          )
+          install.packages("remotes", repos = c("CRAN" = Sys.getenv("CRAN_REPO")))
         shell: Rscript {0}
       - name: Install system dependencies
         env:
@@ -30,22 +28,17 @@ jobs:
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
-      - name: Restore dependencies from renv lockfile
+      - name: Restore and install dependencies
         run: |
-          install.packages(
-            c("renv", "rcmdcheck"),
-            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          )
-          renv::restore(
-            repos = c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          )
+          cran_repo <- c("CRAN" = Sys.getenv("CRAN_REPO"))
+          install.packages(c("renv", "rcmdcheck"), repos = cran_repo)
+          renv::restore(repos = cran_repo)
+          if (!require("drake")) install.packages("drake", repos = cran_repo)
+          if (!require("knitr")) install.packages("knitr", repos = cran_repo)
+          if (!require("digest")) install.packages("knitr", repos = cran_repo)
         shell: Rscript {0}
       - name: drake-make
         run: |
-          rstudio_pm <- c("CRAN" = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest")
-          if (!require("drake")) install.packages("drake", repos = rstudio_pm)
-          if (!require("knitr")) install.packages("knitr", repos = rstudio_pm)
-          if (!require("digest")) install.packages("knitr", repos = rstudio_pm)
           devtools::load_all()
           plan <- training_plan()
           seed <- digest::digest2int(Sys.getenv("COMMIT_HASH"))
