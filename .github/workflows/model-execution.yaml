@@ -14,6 +14,7 @@ jobs:
       CRAN_REPO: https://packagemanager.rstudio.com/all/__linux__/bionic/latest
     runs-on: ubuntu-18.04
     steps:
+      - uses: actions/checkout@v2
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
