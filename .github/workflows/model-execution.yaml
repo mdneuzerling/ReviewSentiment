@@ -1,5 +1,7 @@
 on:
-  deployment:
+  push:
+    branches:
+      - production
   schedule:
     - cron: '0 12 * * 1'
 
