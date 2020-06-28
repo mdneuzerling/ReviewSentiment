@@ -21,7 +21,7 @@ jobs:
       - name: Upload candidate_model to S3
         run: |
           PRODUCTION_MODEL_KEY=$"$GITHUB_REPOSITORY/production-model.tar.gz"
-          aws s3api get-object --bucket "$S3_BUCKET" --key "PRODUCTION_MODEL_KEY" production-model.tar.gz
+          aws s3api get-object --bucket "$S3_BUCKET" --key "$PRODUCTION_MODEL_KEY" production-model.tar.gz
       - name: Un-tar artefacts from production model
         run: tar -xvf production-model.tar.gz
       - uses: r-lib/actions/setup-r@master
